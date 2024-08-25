@@ -19,7 +19,7 @@ const ImageWithBlur = ({ src, placeholder, alt }) => {
             <img
                 src={loaded ? src : placeholder}
                 alt={alt}
-                style={{ filter: loaded ? 'none' : 'blur(10px)', transition: 'filter 0.3s ease-out' }}
+                style={{ filter: loaded ? 'none' : 'blur(10px)', transition: 'filter 0.8s ease-out' }}
                 loading="lazy"
             />
         </div>

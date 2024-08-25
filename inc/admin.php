@@ -21,9 +21,13 @@ class TCBD_IndiaOutToday {
 	 * @author tCoderBD <touhid@tcoderbd.com>
 	 * @since 1.0.0
 	 */
-	// public function __construct() {
-        
-	// }
+	public function __construct() {
+		add_shortcode('IndiaOutToday', [$this, 'tiot_shortcode']);	
+	}
+
+	public function tiot_shortcode() {
+		return '<div id="india_out_today"></div>';
+	}
 }
 
 /**
