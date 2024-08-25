@@ -18,7 +18,7 @@ img {
     &-title {
         font-size: 25px;
         font-weight: 700;
-        margin: 0 0 40px;
+        margin: 0 0 20px;
     }
 
     &-brand {
@@ -136,6 +136,34 @@ img {
     &-notice {
         text-align: center;
         color: rgb(224, 9, 9);
+    }
+
+    &-search {
+        &-box {
+            border: 1px solid rgb(229 231 235);
+            display: flex;
+            align-items: center;
+            padding: 5px 8px;
+            border-radius: 5px;
+            margin-bottom: 50px;
+
+            svg {
+                width: 30px;
+                color: rgb(156 163 175);
+            }
+
+            input {
+                flex: auto;
+                background: transparent;
+                border: 0;
+                padding: 10px;
+
+                &:focus {
+                    outline: 0;
+                    box-shadow: 0 0 0;
+                }
+            }
+        }
     }
 }
 

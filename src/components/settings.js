@@ -28,11 +28,14 @@ const ImageWithBlur = ({ src, placeholder, alt }) => {
 
 const Settings = () => {
     const [apiData, setApiData] = useState([]);
+    const [filteredData, setFilteredData] = useState([]);
     const [alternativesApiData, setAlternativesApiData] = useState([]);
     const [alternativesData, setAlternativesData] = useState([]);
     const [popup, setPopup] = useState("");
     const [loader, setLoader] = useState(false);
     const [visibleDataCount, setVisibleDataCount] = useState(18);
+    const [searchTerm, setSearchTerm] = useState("");
+
     const baseUrl = 'https://data.indiaout.today/api';
 
     useEffect(() => {
@@ -42,6 +45,7 @@ const Settings = () => {
                 const url = `${baseUrl}/brands`;
                 const response = await axios.get(url);
                 setApiData(response.data);
+                setFilteredData(response.data);
                 setLoader(false);
             } catch (error) {
                 console.error("Error fetching data", error);
@@ -65,7 +69,7 @@ const Settings = () => {
 
     const handleScroll = () => {
         if (window.innerHeight + document.documentElement.scrollTop + 200 >= document.documentElement.scrollHeight) {
-            if (!loader && visibleDataCount < apiData.length) {
+            if (!loader && visibleDataCount < filteredData.length) {
                 setVisibleDataCount((prevCount) => prevCount + 18);
             }
         }
@@ -74,8 +78,16 @@ const Settings = () => {
     useEffect(() => {
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
-    }, [visibleDataCount, loader]);
+    }, [visibleDataCount, loader, filteredData]);
 
+    const handleSearch = (e) => {
+        const searchQuery = e.target.value.toLowerCase();
+        setSearchTerm(searchQuery);
+        const filteredBrands = apiData.filter(brand =>
+            brand.name.toLowerCase().includes(searchQuery) || brand.en_name.toLowerCase().includes(searchQuery)
+        );
+        setFilteredData(filteredBrands);
+    };
 
     const body = document.body;
 
@@ -96,8 +108,21 @@ const Settings = () => {
 
     return (
         <div className="tiot-wrapper" id="tiot-all-brands">
-            <h2 className="tiot-title">পন্য ও ব্র্যান্ডসমূহ</h2>
 
+            <h2 className="tiot-title">পন্য ও ব্র্যান্ডসমূহ সার্চ করুন</h2>
+            <div className="tiot-search-box">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6 text-gray-400">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"></path>
+                </svg>
+                <input
+                    type="search"
+                    placeholder="খুঁজে বের করুন ..."
+                    value={searchTerm}
+                    onChange={handleSearch}
+                />
+            </div>
+
+            <h2 className="tiot-title">পন্য ও ব্র্যান্ডসমূহ</h2>
             <div className={`tiot-alternative-popup ${popup}`}>
                 <div className="tiot-alternative-popup-body">
                     <button onClick={closePopup} className="close">x</button>
@@ -127,12 +152,12 @@ const Settings = () => {
                 </div>
             </div>
 
-            {loader && apiData.length === 0 ? (
+            {loader && filteredData.length === 0 ? (
                 <div className="loader"></div>
             ) : (
                 <>
                     <div className="tiot-brand-wrapper">
-                        {apiData.slice(0, visibleDataCount).map((brand) => (
+                        {filteredData.slice(0, visibleDataCount).map((brand) => (
                             <div className="tiot-brand" key={brand.id}>
                                 <div className="tiot-brand-image">
                                     <ImageWithBlur
@@ -142,7 +167,7 @@ const Settings = () => {
                                     />
                                 </div>
                                 <div className="tiot-brand-text">
-                                    <h4>{brand.name}</h4>
+                                    <h4>{brand.name} ({brand.en_name})</h4>
                                     {brand.alternatives && brand.alternatives.length > 0 && (
                                         <button onClick={(e) => alternatives(e.target.value)} value={brand.alternatives}>
                                             বিকল্প
@@ -152,7 +177,7 @@ const Settings = () => {
                             </div>
                         ))}
                     </div>
-                    {visibleDataCount < apiData.length && (
+                    {visibleDataCount < filteredData.length && (
                         <div className="loader"></div>
                     )}
                 </>
