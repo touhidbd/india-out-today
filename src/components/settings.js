@@ -20,7 +20,7 @@ const ImageWithBlur = ({ src, placeholder, alt }) => {
             <img
                 src={loaded ? src : placeholder}
                 alt={alt}
-                style={{ filter: loaded ? 'none' : 'blur(10px)', transition: 'filter 0.8s ease-out' }}
+                style={{ filter: loaded ? 'none' : 'blur(10px)', transition: 'filter 0.2s ease-out' }}
                 loading="lazy"
             />
         </div>
@@ -48,7 +48,7 @@ const Settings = () => {
                 const url = `${baseUrl}/brands`;
                 const response = await axios.get(url);
                 setApiData(response.data);
-                setFilteredData(response.data); // Initialize filtered data
+                setFilteredData(response.data);
                 setLoader(false);
             } catch (error) {
                 console.error("Error fetching data", error);
@@ -124,8 +124,6 @@ const Settings = () => {
         setFilteredData(filteredBrands);
     };
 
-    const body = document.body;
-
     const alternatives = (values) => {
         const alternativesArray = values.split(',').map(Number);
         const filteredAlternatives = alternativesApiData.filter(alt =>
@@ -133,13 +131,25 @@ const Settings = () => {
         );
         setAlternativesData(filteredAlternatives); 
         setPopup("open");
-        body.style.overflow = "hidden";
+        document.body.style.overflow = "hidden";
     };
 
     const closePopup = () => {        
         setPopup("");
-        body.style.overflow = "";
+        document.body.style.overflow = "";
     }
+
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (event.key === "Escape") {
+                closePopup();
+            }
+        };
+        document.addEventListener("keydown", handleKeyDown);
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [closePopup]);  
 
     const options = categoriesApiData.map((category) => ({
         value: category.id,
@@ -152,7 +162,7 @@ const Settings = () => {
                 <div className="tiot-search-wrap">
                     <h2 className="tiot-title">পন্য ও ব্র্যান্ডসমূহ সার্চ করুন</h2>
                     <div className="tiot-search-box">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6 text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"></path>
                         </svg>
                         <input
@@ -164,7 +174,7 @@ const Settings = () => {
                     </div>                     
                 </div>
                 <div className="tiot-search-wrap">
-                    <h2 className="tiot-title">বিভাগসমূহ সার্চ করুন</h2>     
+                    <h2 className="tiot-title">বিভাগসমূহ ফিল্টার করুন</h2>     
                     <Select 
                         options={options} 
                         placeholder="বিভাগ সিলেক্ট করুন" 
@@ -174,11 +184,13 @@ const Settings = () => {
                 </div> 
             </div>
 
-            <h2 className="tiot-title">পন্য ও ব্র্যান্ডসমূহ</h2>
+            <h2 className="tiot-title">ভারতীয় পন্য ও ব্র্যান্ডসমূহ</h2>
+
             <div className={`tiot-alternative-popup ${popup}`}>
                 <div className="tiot-alternative-popup-body">
                     <button onClick={closePopup} className="close">x</button>
                     <h2>বাংলাদেশী বিকল্প পন্য ও ব্র্যান্ডসমূহ</h2>
+                    <p><small><em>কিবোর্ড থেকে "ESC" চেপে অথবা X বাটন এ ক্লিক করে পপাআপ বন্ধ করুন।</em></small></p>
                     <div className="tiot-alternative-popup-brand">
                         <div className="tiot-brand-wrapper">
                             {alternativesData.length > 0 ? (
@@ -187,7 +199,6 @@ const Settings = () => {
                                         <div className="tiot-brand-image">
                                             <ImageWithBlur
                                                 src={alternative.image}
-                                                placeholder={alternative.placeholderImage}
                                                 alt={alternative.name}
                                             />
                                         </div>
@@ -214,7 +225,6 @@ const Settings = () => {
                                 <div className="tiot-brand-image">
                                     <ImageWithBlur
                                         src={brand.image}
-                                        placeholder={brand.placeholderImage}
                                         alt={brand.name}
                                     />
                                 </div>
