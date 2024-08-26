@@ -15,12 +15,11 @@
     "boycott",
     "india",
     "wordpress",
-    "plugin",
-    "boycott",
-    "india"
+    "bangladesh",
+    "boycott"
   ],
   "author": "Touhidul Sadeek",
-  "license": "GPL-3.0",
+  "license": "GPL-2.0",
   "bugs": {
     "url": "https://github.com/touhidbd/india-out-today/issues"
   },
