@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Select from 'react-select';
 
 const loadImage = (src, onLoadCallback) => {
     const img = new Image();
@@ -31,6 +32,8 @@ const Settings = () => {
     const [filteredData, setFilteredData] = useState([]);
     const [alternativesApiData, setAlternativesApiData] = useState([]);
     const [alternativesData, setAlternativesData] = useState([]);
+    const [categoriesApiData, setCategoriesApiData] = useState([]);
+    const [selectedCategoryId, setSelectedCategoryId] = useState(null);
     const [popup, setPopup] = useState("");
     const [loader, setLoader] = useState(false);
     const [visibleDataCount, setVisibleDataCount] = useState(18);
@@ -45,7 +48,7 @@ const Settings = () => {
                 const url = `${baseUrl}/brands`;
                 const response = await axios.get(url);
                 setApiData(response.data);
-                setFilteredData(response.data);
+                setFilteredData(response.data); // Initialize filtered data
                 setLoader(false);
             } catch (error) {
                 console.error("Error fetching data", error);
@@ -63,8 +66,19 @@ const Settings = () => {
             }
         };
 
+        const fetchCategories = async () => {
+            const altUrl = `${baseUrl}/categories`;
+            try {
+                const response = await axios.get(altUrl);
+                setCategoriesApiData(response.data);  
+            } catch (error) {
+                console.error("Error fetching categories", error);
+            }
+        };
+
         fetchData();
         fetchAlternatives();
+        fetchCategories();
     }, [baseUrl]);
 
     const handleScroll = () => {
@@ -83,9 +97,30 @@ const Settings = () => {
     const handleSearch = (e) => {
         const searchQuery = e.target.value.toLowerCase();
         setSearchTerm(searchQuery);
-        const filteredBrands = apiData.filter(brand =>
-            brand.name.toLowerCase().includes(searchQuery) || brand.en_name.toLowerCase().includes(searchQuery)
-        );
+        filterData(searchQuery, selectedCategoryId);
+    };
+
+    const handleCategoryChange = (selectedOption) => {
+        const categoryId = selectedOption ? selectedOption.value : null;
+        setSelectedCategoryId(categoryId);
+        filterData(searchTerm, categoryId);
+    };
+
+    const filterData = (searchQuery, categoryId) => {
+        let filteredBrands = apiData;
+        
+        if (searchQuery) {
+            filteredBrands = filteredBrands.filter(
+                brand => brand.name.toLowerCase().includes(searchQuery) || brand.en_name.toLowerCase().includes(searchQuery)
+            );
+        }
+        
+        if (categoryId) {
+            filteredBrands = filteredBrands.filter(
+                brand => brand.categories && brand.categories.includes(categoryId)
+            );
+        }
+
         setFilteredData(filteredBrands);
     };
 
@@ -106,20 +141,37 @@ const Settings = () => {
         body.style.overflow = "";
     }
 
+    const options = categoriesApiData.map((category) => ({
+        value: category.id,
+        label: category.name,
+    }));
+
     return (
         <div className="tiot-wrapper" id="tiot-all-brands">
-
-            <h2 className="tiot-title">পন্য ও ব্র্যান্ডসমূহ সার্চ করুন</h2>
-            <div className="tiot-search-box">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6 text-gray-400">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"></path>
-                </svg>
-                <input
-                    type="search"
-                    placeholder="খুঁজে বের করুন ..."
-                    value={searchTerm}
-                    onChange={handleSearch}
-                />
+            <div className="tiot-search">
+                <div className="tiot-search-wrap">
+                    <h2 className="tiot-title">পন্য ও ব্র্যান্ডসমূহ সার্চ করুন</h2>
+                    <div className="tiot-search-box">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6 text-gray-400">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"></path>
+                        </svg>
+                        <input
+                            type="search"
+                            placeholder="খুঁজে বের করুন ..."
+                            value={searchTerm}
+                            onChange={handleSearch}
+                        />
+                    </div>                     
+                </div>
+                <div className="tiot-search-wrap">
+                    <h2 className="tiot-title">বিভাগসমূহ সার্চ করুন</h2>     
+                    <Select 
+                        options={options} 
+                        placeholder="বিভাগ সিলেক্ট করুন" 
+                        isClearable={true}
+                        onChange={handleCategoryChange}
+                    /> 
+                </div> 
             </div>
 
             <h2 className="tiot-title">পন্য ও ব্র্যান্ডসমূহ</h2>

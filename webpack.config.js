@@ -42,6 +42,9 @@ module.exports = {
             }
         ]
     },
+    performance : {
+        hints : false
+    },
     plugins: [
         new MiniCssExtractPlugin({
             filename: "[name].css",

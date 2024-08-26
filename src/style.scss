@@ -48,7 +48,7 @@ img {
         &-text {
             h4 {
                 margin: 0 0 10px;
-                font-size: 25px;
+                font-size: 100%;
                 font-weight: 500;
             }
 
@@ -139,13 +139,22 @@ img {
     }
 
     &-search {
+        margin-bottom: 30px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 30px;
+
+        @media screen and (max-width: 991px) {
+            grid-template-columns: 1fr;
+        }
+
         &-box {
-            border: 1px solid rgb(229 231 235);
+            border: 1px solid #ccc;
             display: flex;
             align-items: center;
-            padding: 5px 8px;
+            padding: 4px 8px;
             border-radius: 5px;
-            margin-bottom: 50px;
+            min-height: 32.8px;
 
             svg {
                 width: 30px;
@@ -154,9 +163,10 @@ img {
 
             input {
                 flex: auto;
-                background: transparent;
+                background: rgba(0, 0, 0, 0);
+                padding: 3px;
+                font-size: 18px;
                 border: 0;
-                padding: 10px;
 
                 &:focus {
                     outline: 0;
@@ -185,5 +195,21 @@ img {
 @keyframes l3 {
     to {
         transform: rotate(1turn)
+    }
+}
+
+.css-13cymwt-control,
+.css-1nmdiq5-menu div,
+.css-1xc3v61-indicatorContainer {
+    cursor: pointer !important;
+}
+
+.css-t3ipsp-control {
+    box-shadow: 0 0 0 !important;
+    border-color: rgb(204, 204, 204) !important;
+
+    &:hover,
+    &:focus {
+        border-color: rgb(204, 204, 204) !important;
     }
 }
